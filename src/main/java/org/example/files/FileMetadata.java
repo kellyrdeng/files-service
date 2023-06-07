@@ -1,19 +1,25 @@
 package org.example.files;
 
 public class FileMetadata {
-    private int size;
+    private long size;
     private String fileName;
+    private int id;
 
-    public FileMetadata(int size, String fileName) {
+    public FileMetadata(int id, long size, String fileName) {
+        this.id = id;
         this.size = size;
         this.fileName = fileName;
     }
 
-    public int getSize() {
+    public long getSize() {
         return size;
     }
 
     public String getFilename() {
         return fileName;
+    }
+
+    public int getID() {
+        return id;
     }
 }

@@ -1,24 +1,27 @@
 package org.example.files.storage.memory;
 
+import org.example.files.File;
 import java.util.HashMap;
 import java.util.Map;
 
 public class MapStorage {
-    private HashMap<Integer, byte[]> map;
+    private HashMap<Integer, File> map;
 
     public MapStorage() {
         this.map = new HashMap<>();
     }
 
-    public void store(Integer id, byte[] bytes) {
-        map.put(id, bytes);
+    public File store(Integer id, byte[] bytes, HashMap<String, String> labels) {
+        File newFile = new File(bytes, labels);
+        map.put(id, newFile);
+        return newFile;
     }
 
     public boolean fileExists(Integer id) {
         return map.containsKey(id);
     }
 
-    public long fileSize(Integer id) {
-        return map.get(id).length;
+    public File getFile(Integer id) {
+        return map.get(id);
     }
 }

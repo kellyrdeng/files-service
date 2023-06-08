@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import org.example.files.storage.memory.MapStorage;
 
@@ -35,14 +36,31 @@ public class FilesServiceController {
 		if (!storage.fileExists(parsedID)) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "resource not found");
 		}
-		return new FileMetadata(parsedID, storage.fileSize(parsedID), "newFile");
+		File f = storage.getFile(parsedID);
+		return new FileDescriptor(parsedID, f.getMetadata().getSize(), f.getMetadata().getLabels());
 	}
 
+	//label format: "a:b,c:d"
+	//need minimum name label
 	@PostMapping("/files/upload")
-	public FileMetadata uploadFile(@RequestParam("file") MultipartFile multipartFile) throws IOException{
-		storage.store(++counter, multipartFile.getBytes());
-		System.out.println("File Size: " + multipartFile.getSize());
+	public FileDescriptor uploadFile(@RequestParam("file") MultipartFile multipartFile, @RequestParam("labels") String labels) throws IOException{
+		HashMap<String, String> labelsMap = new HashMap<>();
+		
+		Boolean nameIncluded = false;
+		String[] labelsArr = labels.split(",");
+		for (int i = 0; i < labelsArr.length; i++) {
+			String[] oneLabel = labelsArr[i].split(":"); //"a:b" => [a,b]
+			labelsMap.put(oneLabel[0], oneLabel[1]);
+			if (oneLabel[0].equals("name")) {
+				nameIncluded = true;
+			}
+		}
+		if (!nameIncluded) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "must include a name label");
+		}
 
-		return new FileMetadata(counter, multipartFile.getSize(), null);
+		File newFile = storage.store(++counter, multipartFile.getBytes(), labelsMap);
+
+		return new FileDescriptor(counter, multipartFile.getSize(), labelsMap);
 	}
 }

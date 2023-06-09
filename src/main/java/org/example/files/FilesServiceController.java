@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.example.files.storage.memory.MapStorage;
 
@@ -28,7 +31,7 @@ public class FilesServiceController {
 	}
 
     @GetMapping("/files/{id}")
-	public FileMetadata getFileMetadata(@PathVariable String id) {
+	public FileDescriptor getFileMetadata(@PathVariable String id) {
 		Integer parsedID = Integer.parseInt(id);
         if (parsedID < 1) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid id");
@@ -40,27 +43,52 @@ public class FilesServiceController {
 		return new FileDescriptor(parsedID, f.getMetadata().getSize(), f.getMetadata().getLabels());
 	}
 
-	//label format: "a:b,c:d"
+	//http://localhost:8080/files?labels=name:kelly,location:portland
 	//need minimum name label
-	@PostMapping("/files/upload")
+	@PostMapping("/files")
 	public FileDescriptor uploadFile(@RequestParam("file") MultipartFile multipartFile, @RequestParam("labels") String labels) throws IOException{
-		HashMap<String, String> labelsMap = new HashMap<>();
+		ArrayList<String> labelList = labelsToList(labels);
+		storage.store(++counter, multipartFile.getBytes(), labelList);
+		return new FileDescriptor(counter, multipartFile.getSize(), labelList);
+	}
+
+	@GetMapping("/files")
+	public List<FileDescriptor> searchFiles(@RequestParam("labels") String labels) {
+		ArrayList<String> labelList = labelsToList(labels);
+		ArrayList<File> resultFiles = new ArrayList<>();
+
+		List<File> firstList = storage.getFilesByLabel(labelList.get(0));
+		for (File f : firstList) {
+			resultFiles.add(f);
+		}
+
+		for (int i = 1; i < labelList.size(); i++) {
+			resultFiles.retainAll(storage.getFilesByLabel(labelList.get(i)));
+		}
+
+		List<FileDescriptor> result = new ArrayList<FileDescriptor>();
+		for(File f : resultFiles) {
+			FileDescriptor fd = new FileDescriptor(f.getID(), f.getMetadata().getSize(), f.getMetadata().getLabels());
+			result.add(fd);
+		}
+		return result;
+	}
+
+	public ArrayList<String> labelsToList(String labels) {
+		ArrayList<String> labelsArrlist = new ArrayList<String>();
 		
 		Boolean nameIncluded = false;
-		String[] labelsArr = labels.split(",");
+		String[] labelsArr = labels.split(","); //["name:kelly", "location:portland"]
 		for (int i = 0; i < labelsArr.length; i++) {
 			String[] oneLabel = labelsArr[i].split(":"); //"a:b" => [a,b]
-			labelsMap.put(oneLabel[0], oneLabel[1]);
 			if (oneLabel[0].equals("name")) {
 				nameIncluded = true;
 			}
+			labelsArrlist.add(labelsArr[i]); //"name:kelly" added
 		}
 		if (!nameIncluded) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "must include a name label");
 		}
-
-		File newFile = storage.store(++counter, multipartFile.getBytes(), labelsMap);
-
-		return new FileDescriptor(counter, multipartFile.getSize(), labelsMap);
+		return labelsArrlist;
 	}
 }

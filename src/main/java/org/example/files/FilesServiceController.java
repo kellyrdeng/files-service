@@ -16,6 +16,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.example.files.storage.memory.MapStorage;
 
@@ -23,16 +24,12 @@ import org.example.files.storage.memory.MapStorage;
 @RestController
 public class FilesServiceController {
 	private int counter;
-	private int statusCount;
-	private Object statusCounterLock = new Object();
+	private AtomicLong statusCount = new AtomicLong(0);
 	MapStorage storage = new MapStorage();
 
 	@GetMapping("/status")
 	public Status status() {
-		synchronized (statusCounterLock) {
-			statusCount++;
-		}
-		return new Status("ok", statusCount);
+		return new Status("ok", statusCount.incrementAndGet());
 	}
 
     @GetMapping("/files/{id}")

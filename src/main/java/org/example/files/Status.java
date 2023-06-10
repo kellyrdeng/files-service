@@ -2,9 +2,9 @@ package org.example.files;
 
 public class Status {
     private String status;
-    private int count;
+    private long count;
 
-    public Status(String status, int count) {
+    public Status(String status, long count) {
         this.status = status;
         this.count = count;
     }
@@ -13,7 +13,7 @@ public class Status {
         return this.status;
     }
 
-    public int getCount() {
+    public long getCount() {
         return this.count;
     }
 }

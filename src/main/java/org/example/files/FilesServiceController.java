@@ -23,11 +23,16 @@ import org.example.files.storage.memory.MapStorage;
 @RestController
 public class FilesServiceController {
 	private int counter;
+	private int statusCount;
+	private Object statusCounterLock = new Object();
 	MapStorage storage = new MapStorage();
 
 	@GetMapping("/status")
 	public Status status() {
-		return new Status("ok");
+		synchronized (statusCounterLock) {
+			statusCount++;
+		}
+		return new Status("ok", statusCount);
 	}
 
     @GetMapping("/files/{id}")

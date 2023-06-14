@@ -23,7 +23,7 @@ import org.example.files.storage.memory.MapStorage;
 
 @RestController
 public class FilesServiceController {
-	private int counter;
+	private AtomicLong counter = new AtomicLong(0);
 	private AtomicLong statusCount = new AtomicLong(0);
 	MapStorage storage = new MapStorage();
 
@@ -34,7 +34,7 @@ public class FilesServiceController {
 
     @GetMapping("/files/{id}")
 	public FileDescriptor getFileMetadata(@PathVariable String id) {
-		Integer parsedID = Integer.parseInt(id);
+		Long parsedID = Long.parseLong(id);
         if (parsedID < 1) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid id");
         }
@@ -50,8 +50,8 @@ public class FilesServiceController {
 	@PostMapping("/files")
 	public FileDescriptor uploadFile(@RequestParam("file") MultipartFile multipartFile, @RequestParam("labels") String labels) throws IOException{
 		ArrayList<String> labelList = labelsToList(labels);
-		storage.store(++counter, multipartFile.getBytes(), labelList);
-		return new FileDescriptor(counter, multipartFile.getSize(), labelList);
+		storage.store(counter.incrementAndGet(), multipartFile.getBytes(), labelList);
+		return new FileDescriptor(counter.get(), multipartFile.getSize(), labelList);
 	}
 
 	@GetMapping("/files")

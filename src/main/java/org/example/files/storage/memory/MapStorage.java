@@ -9,16 +9,16 @@ import java.util.Map;
 
 public class MapStorage {
     private HashMap<String, ArrayList<File>> labelsMap; //label -> <File1, File2, File3>
-    private HashMap<Integer, File> idMap; // id -> File
+    private HashMap<Long, File> idMap; // id -> File
 
     public MapStorage() {
         this.labelsMap = new HashMap<>();
         this.idMap = new HashMap<>();
     }
 
-    public File store(Integer id, byte[] bytes, ArrayList<String> labels) {
-        File newFile = new File(id, bytes, labels);
-        idMap.put(id, newFile);
+    public File store(Long counter, byte[] bytes, ArrayList<String> labels) {
+        File newFile = new File(counter, bytes, labels);
+        idMap.put(counter, newFile);
 
         for (String l : labels) {
             if (!labelsMap.containsKey(l)) {
@@ -30,12 +30,12 @@ public class MapStorage {
         return newFile;
     }
 
-    public boolean fileExists(Integer id) {
-        return idMap.containsKey(id);
+    public boolean fileExists(Long parsedID) {
+        return idMap.containsKey(parsedID);
     }
 
-    public File getFile(Integer id) {
-        return idMap.get(id);
+    public File getFile(Long parsedID) {
+        return idMap.get(parsedID);
     }
 
     public List<File> getFilesByLabel(String label) {

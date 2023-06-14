@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class File {
-    private int id;
+    private Long id;
     private byte[] contents;
     private FileMetadata metadata;
 
-    public File(int id, byte[] contents, ArrayList<String> labels) {
+    public File(Long id, byte[] contents, ArrayList<String> labels) {
         this.id = id;
         this.contents = contents;
         metadata = new FileMetadata(contents.length, labels);
@@ -22,7 +22,7 @@ public class File {
         return this.metadata;
     }
 
-    public int getID() {
+    public Long getID() {
         return id;
     }
 }

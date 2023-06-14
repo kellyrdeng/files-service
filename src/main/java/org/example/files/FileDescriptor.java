@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class FileDescriptor extends FileMetadata {
-    private int id;
+    private Long id;
 
-    public FileDescriptor(int id, long size, ArrayList<String> labels) {
+    public FileDescriptor(Long counter, long size, ArrayList<String> labels) {
         super(size, labels);
-        this.id = id;
+        this.id = counter;
     }
 
-    public int getID() {
+    public Long getID() {
         return id;
     }
 }

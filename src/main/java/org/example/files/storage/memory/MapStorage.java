@@ -39,7 +39,7 @@ public class MapStorage {
     }
 
     public List<File> getFilesByLabel(String label) {
-        if (labelsMap.containsKey(label)) {
+        if (!labelsMap.containsKey(label)) {
             return List.of();
         }
         return labelsMap.get(label);

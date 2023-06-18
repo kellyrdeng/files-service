@@ -76,17 +76,20 @@ public class FilesServiceController {
 		return result;
 	}
 
-	public ArrayList<String> labelsToList(String labels) {
+	public static ArrayList<String> labelsToList(String labels) {
 		ArrayList<String> labelsArrlist = new ArrayList<String>();
 		
 		Boolean nameIncluded = false;
 		String[] labelsArr = labels.split(","); //["name:kelly", "location:portland"]
 		for (int i = 0; i < labelsArr.length; i++) {
+			if (!FileMetadata.validLabel(labelsArr[i])) {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid label format, must be key:value");
+			}
 			String[] oneLabel = labelsArr[i].split(":"); //"a:b" => [a,b]
 			if (oneLabel[0].equals("name")) {
 				nameIncluded = true;
 			}
-			labelsArrlist.add(labelsArr[i]); //"name:kelly" added
+			labelsArrlist.add(labelsArr[i].toLowerCase()); //"name:kelly" added
 		}
 		if (!nameIncluded) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "must include a name label");

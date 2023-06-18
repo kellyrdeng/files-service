@@ -19,4 +19,13 @@ public class FileMetadataTest {
         assertEquals(fmd.getSize(), Long.valueOf(0));
         assertEquals(fmd.getLabels(), labels);
     }
+
+    @Test
+    public void testValidLabel() {
+        assertEquals(true, FileMetadata.validLabel("name:kelly"));
+        assertEquals(false, FileMetadata.validLabel("name::kelly"));
+        assertEquals(false, FileMetadata.validLabel("name"));
+        assertEquals(false, FileMetadata.validLabel(""));
+        assertEquals(false, FileMetadata.validLabel(" "));
+    }
 }

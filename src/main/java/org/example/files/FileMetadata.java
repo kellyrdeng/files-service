@@ -1,13 +1,12 @@
 package org.example.files;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 
 public class FileMetadata {
     private long size;
-    private ArrayList<String> labels;
+    private List<String> labels;
 
-    public FileMetadata(long size, ArrayList<String> labels) {
+    public FileMetadata(long size, List<String> labels) {
         this.size = size;
         this.labels = labels;
     }
@@ -16,7 +15,12 @@ public class FileMetadata {
         return size;
     }
 
-    public ArrayList<String> getLabels() {
+    public List<String> getLabels() {
         return labels;
+    }
+
+    public static boolean validLabel(String label) { //"name:kelly"
+        String[] splitted = label.split(":");
+        return splitted.length == 2; // ["name", "kelly"]
     }
 }

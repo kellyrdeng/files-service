@@ -16,15 +16,15 @@ public class MapStorageTest {
         MapStorage storage = new MapStorage();
 
         ArrayList<String> labels = new ArrayList<>();
-        labels.add("name=jack");
-        labels.add("location=nyc");
+        labels.add("name:jack");
+        labels.add("location:nyc");
         storage.store(Long.valueOf(1), new byte[0], labels);
 
-        File jackFile = storage.getFilesByLabel("name=jack").get(0);
-        File nycFile = storage.getFilesByLabel("location=nyc").get(0);
+        File jackFile = storage.getFilesByLabel("name:jack").get(0);
+        File nycFile = storage.getFilesByLabel("location:nyc").get(0);
         
-        assertEquals(storage.getFilesByLabel("name=jack").size(), 1);
-        assertEquals(storage.getFilesByLabel("location=nyc").size(), 1);
+        assertEquals(storage.getFilesByLabel("name:jack").size(), 1);
+        assertEquals(storage.getFilesByLabel("location:nyc").size(), 1);
         assertEquals(jackFile, nycFile);
     }
 
@@ -33,7 +33,7 @@ public class MapStorageTest {
         MapStorage storage = new MapStorage();
 
         ArrayList<String> labels = new ArrayList<>();
-        labels.add("name=jack");
+        labels.add("name:jack");
         storage.store(Long.valueOf(1), new byte[0], labels);
 
         assertTrue(storage.fileExists(Long.valueOf(1)));
@@ -44,14 +44,14 @@ public class MapStorageTest {
     public void testGetFilesByLabel() {
         MapStorage storage = new MapStorage();
 
-        assertEquals(storage.getFilesByLabel("location=nyc"), new ArrayList<File>());
+        assertEquals(storage.getFilesByLabel("location:nyc"), new ArrayList<File>());
 
         ArrayList<String> labels = new ArrayList<>();
-        labels.add("name=jack");
-        labels.add("location=nyc");
+        labels.add("name:jack");
+        labels.add("location:nyc");
         File f = storage.store(Long.valueOf(1), new byte[0], labels);
 
-        assertEquals(storage.getFilesByLabel("name=jack").get(0), f);
-        assertEquals(storage.getFilesByLabel("location=nyc").get(0), f);
+        assertEquals(storage.getFilesByLabel("name:jack").get(0), f);
+        assertEquals(storage.getFilesByLabel("location:nyc").get(0), f);
     }
 }

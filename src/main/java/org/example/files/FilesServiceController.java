@@ -2,9 +2,7 @@ package org.example.files;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,12 +10,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.example.files.storage.Storage;
 import org.example.files.storage.memory.MapStorage;
 
 
@@ -25,7 +22,7 @@ import org.example.files.storage.memory.MapStorage;
 public class FilesServiceController {
 	private AtomicLong counter = new AtomicLong(0);
 	private AtomicLong statusCount = new AtomicLong(0);
-	MapStorage storage = new MapStorage();
+	private Storage storage = new MapStorage();
 
 	@GetMapping("/status")
 	public Status status() {
@@ -35,9 +32,9 @@ public class FilesServiceController {
     @GetMapping("/files/{id}")
 	public FileDescriptor getFileMetadata(@PathVariable String id) {
 		Long parsedID = Long.parseLong(id);
-        if (parsedID < 1) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid id");
-        }
+		if (parsedID < 1) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid id");
+		}
 		if (!storage.fileExists(parsedID)) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "resource not found");
 		}
@@ -54,6 +51,7 @@ public class FilesServiceController {
 		return new FileDescriptor(counter.get(), multipartFile.getSize(), labelList);
 	}
 
+	//http://localhost:8080/files?labels=name:kelly,location:portland
 	@GetMapping("/files")
 	public List<FileDescriptor> searchFiles(@RequestParam("labels") String labels) {
 		ArrayList<String> labelList = labelsToList(labels);
